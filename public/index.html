@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREEN-API Test Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        h1 { font-size: 20px; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
+        input:focus, textarea:focus { outline: none; border-color: #007bff; }
+        button { padding: 10px 20px; margin-right: 10px; margin-bottom: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #000; }
+        .btn-primary { background: #007bff; color: white; }
+        textarea { min-height: 150px; font-family: monospace; resize: vertical; }
+        .status { padding: 10px; margin-top: 10px; border-radius: 4px; display: none; }
+        .status.success { background: #d4edda; color: #155724; display: block; }
+        .status.error { background: #f8d7da; color: #721c24; display: block; }
+        .status.loading { background: #d1ecf1; color: #0c5460; display: block; }
+        .hidden { display: none; }
+        .form-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>GREEN-API Test Panel</h1>
+
+    <label for="idInstance">idInstance:</label>
+    <input type="text" id="idInstance" placeholder="1101234567">
+
+    <label for="apiTokenInstance">apiTokenInstance:</label>
+    <input type="password" id="apiTokenInstance" placeholder="Ваш токен">
+
+    <div>
+        <button class="btn-info" onclick="callMethod('getSettings')">getSettings</button>
+        <button class="btn-info" onclick="callMethod('getStateInstance')">getStateInstance</button>
+        <button class="btn-success" onclick="showSendMessageForm()">sendMessage</button>
+        <button class="btn-warning" onclick="showSendFileForm()">sendFileByUrl</button>
+    </div>
+
+    <div id="sendMessageFields" class="form-section hidden">
+        <label for="chatId">chatId (номер телефона):</label>
+        <input type="text" id="chatId" placeholder="79991234567@c.us">
+
+        <label for="message">Сообщение:</label>
+        <input type="text" id="message" placeholder="Текст сообщения">
+
+        <button class="btn-success" onclick="callMethod('sendMessage')">Отправить</button>
+        <button class="btn-primary" onclick="hideAdditionalForms()">Закрыть</button>
+    </div>
+
+    <div id="sendFileFields" class="form-section hidden">
+        <label for="fileChatId">chatId (номер телефона):</label>
+        <input type="text" id="fileChatId" placeholder="79991234567@c.us">
+
+        <label for="fileUrl">URL файла:</label>
+        <input type="text" id="fileUrl" placeholder="https://example.com/file.pdf">
+
+        <label for="fileName">Имя файла:</label>
+        <input type="text" id="fileName" placeholder="document.pdf">
+
+        <label for="fileCaption">Подпись (необязательно):</label>
+        <input type="text" id="fileCaption" placeholder="Описание">
+
+        <button class="btn-warning" onclick="callMethod('sendFileByUrl')">Отправить файл</button>
+        <button class="btn-primary" onclick="hideAdditionalForms()">Закрыть</button>
+    </div>
+
+    <label for="response">Ответ API (только для чтения):</label>
+    <textarea id="response" readonly placeholder="Здесь появится ответ..."></textarea>
+
+    <div id="status" class="status"></div>
+
+    <script>
+        // Загрузка сохранённых данных
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedId = localStorage.getItem('green-api-idInstance');
+            const savedToken = localStorage.getItem('green-api-apiTokenInstance');
+            if (savedId) document.getElementById('idInstance').value = savedId;
+            if (savedToken) document.getElementById('apiTokenInstance').value = savedToken;
+        });
+
+        // Сохранение при изменении
+        document.getElementById('idInstance').addEventListener('change', (e) => {
+            localStorage.setItem('green-api-idInstance', e.target.value);
+        });
+        document.getElementById('apiTokenInstance').addEventListener('change', (e) => {
+            localStorage.setItem('green-api-apiTokenInstance', e.target.value);
+        });
+
+        function showSendMessageForm() {
+            hideAdditionalForms();
+            document.getElementById('sendMessageFields').classList.remove('hidden');
+        }
+
+        function showSendFileForm() {
+            hideAdditionalForms();
+            document.getElementById('sendFileFields').classList.remove('hidden');
+        }
+
+        function hideAdditionalForms() {
+            document.getElementById('sendMessageFields').classList.add('hidden');
+            document.getElementById('sendFileFields').classList.add('hidden');
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+
+        async function callMethod(methodName) {
+            const idInstance = document.getElementById('idInstance').value.trim();
+            const apiTokenInstance = document.getElementById('apiTokenInstance').value.trim();
+
+            if (!idInstance || !apiTokenInstance) {
+                showStatus('Введите idInstance и apiTokenInstance', 'error');
+                return;
+            }
+
+            let requestData = { method, idInstance, apiTokenInstance };
+
+            if (methodName === 'sendMessage') {
+                const chatId = document.getElementById('chatId').value.trim();
+                const message = document.getElementById('message').value.trim();
+                if (!chatId || !message) {
+                    showStatus('Введите номер и текст сообщения', 'error');
+                    return;
+                }
+                requestData.chatId = chatId;
+                requestData.message = message;
+            } else if (methodName === 'sendFileByUrl') {
+                const chatId = document.getElementById('fileChatId').value.trim();
+                const fileUrl = document.getElementById('fileUrl').value.trim();
+                const fileName = document.getElementById('fileName').value.trim();
+                if (!chatId || !fileUrl || !fileName) {
+                    showStatus('Заполните обязательные поля', 'error');
+                    return;
+                }
+                requestData.chatId = chatId;
+                requestData.fileUrl = fileUrl;
+                requestData.fileName = fileName;
+                const caption = document.getElementById('fileCaption').value.trim();
+                if (caption) requestData.caption = caption;
+            }
+
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+            showStatus('Запрос...', 'loading');
+
+            try {
+                const response = await fetch('/api/green-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('response').value = JSON.stringify(result.data, null, 2);
+                    showStatus('Успешно!', 'success');
+                } else {
+                    document.getElementById('response').value = JSON.stringify(result, null, 2);
+                    showStatus('Ошибка: ' + (result.error || result.message), 'error');
+                }
+            } catch (error) {
+                document.getElementById('response').value = error.message;
+                showStatus('Ошибка: ' + error.message, 'error');
+            } finally {
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+    </script>
+</body>
+</html>

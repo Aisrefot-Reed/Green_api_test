@@ -1,0 +1,20 @@
+{
+  "name": "green-api-test",
+  "version": "1.0.0",
+  "description": "Тестовое задание DevOps - GREEN-API HTML страница",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "vercel dev"
+  },
+  "keywords": [
+    "green-api",
+    "whatsapp",
+    "test-task"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
