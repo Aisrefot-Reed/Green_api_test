@@ -121,7 +121,7 @@
                 return;
             }
 
-            let requestData = { method, idInstance, apiTokenInstance };
+            let requestData = { method: methodName, idInstance, apiTokenInstance };
 
             if (methodName === 'sendMessage') {
                 const chatId = document.getElementById('chatId').value.trim();

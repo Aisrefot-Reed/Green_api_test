@@ -222,5 +222,18 @@ cp .env.example .env
 - [GREEN-API документация](https://green-api.com/docs/)
 - [Vercel документация](https://vercel.com/docs)
 - [Serverless Functions](https://vercel.com/docs/functions)
+
+## 📝 Результат выполнения задания
+
+Для отправки на hr@green-api.com:
+
+1. ✅ **Резюме** — приложить PDF
+2. ✅ **Telegram** — ссылка на профиль
+3. ✅ **GitHub** — https://github.com/ВАШ_НИК/green-api-test
+4. ✅ **HTML страница** — https://green-api-test-xxx.vercel.app
+5. ✅ **Скриншоты/видео** — (по желанию)
+
 ---
 
+**Автор:** [Ваше имя]  
+**Дата:** 2026
