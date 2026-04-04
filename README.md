@@ -235,5 +235,17 @@ cp .env.example .env
 
 ---
 
-**Автор:** [Ваше имя]  
+## 📸 Скриншоты
+
+### getSettings — ответ API
+
+![getSettings](public/screenshot1.png)
+
+### sendMessage — отправка сообщения
+
+![sendMessage](public/screenshot.png)
+
+---
+
+**Автор:** [Ваше имя]
 **Дата:** 2026
