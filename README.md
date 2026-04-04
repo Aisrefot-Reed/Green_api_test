@@ -246,6 +246,3 @@ cp .env.example .env
 ![sendMessage](public/screenshot.png)
 
 ---
-
-**Автор:** [Ваше имя]
-**Дата:** 2026
